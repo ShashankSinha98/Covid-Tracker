@@ -3,6 +3,8 @@ package com.example.covidtracker
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.AbsListView
 import android.widget.TextView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
@@ -15,15 +17,24 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+
+
 class MainActivity : AppCompatActivity() {
 
     private val TAG  = "MainActivity"
+    lateinit var stateAdapter : StateAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /*swipeToRefresh.setOnRefreshListener {
+            fetchData()
+        }*/
+
+
         // Get Covid data from api
+        list.addHeaderView(LayoutInflater.from(this).inflate(R.layout.item_header,list,false))
         fetchData()
     }
 
@@ -42,9 +53,15 @@ class MainActivity : AppCompatActivity() {
                 launch (Dispatchers.Main){
                     // Displaying top header data
                     bindCombinedData(data.statewise[0])
+                    bindStatewiseData(data.statewise.subList(0,data.statewise.size))
                 }
             }
         }
+    }
+
+    private fun bindStatewiseData(subList: List<StatewiseItem>) {
+        stateAdapter = StateAdapter(subList)
+        list.adapter = stateAdapter
     }
 
     private fun bindCombinedData(data: StatewiseItem) {
